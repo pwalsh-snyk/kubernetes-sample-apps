@@ -8,7 +8,7 @@ Main purpose is to serve as a demo for the [DOKS-CI-CD](https://github.com/digit
 
 To complete all steps and deploy the `2048-game` sample application, you will need:
 
-1. A [DOKS](https://docs.digitalocean.com/products/kubernetes/quickstart) cluster configured and running.
+1. A Kubernetes cluster configured and running.
 2. Latest [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) version for Kubernetes interaction.
 3. [Git](https://git-scm.com/downloads) client for interacting with the [kubernetes-sample-apps](https://github.com/digitalocean/kubernetes-sample-apps) repository.
 4. [NodeJS](https://nodejs.org) and `npm` to build and test the 2048-game application code.
@@ -39,19 +39,19 @@ A sample [Dockerfile](./Dockerfile) is provided in this repository as well, to h
 First, you need to clone this repository (if not already):
 
 ```shell
-git clone https://github.com/digitalocean/kubernetes-sample-apps.git
+git clone https://github.com/pwalsh-snyk/kubernetes-sample-apps.git
 ```
 
 Then, change directory to your local copy:
 
 ```shell
-cd kubernetes-sample-apps
+cd kubernetes-sample-apps/game-2048-example
 ```
 
-Next, issue below command to build the docker image for the 2048 game app, Below examples assume you already have a [DigitalOcean Docker Registry](https://docs.digitalocean.com/products/container-registry) set up (make sure to replace the `<>` placeholders accordingly):
+Next, issue below command to build the docker image for the 2048 game app, Below examples assume you already have a [Docker Hub Repository](https://www.docker.com/products/docker-hub/) set up (make sure to replace the `<>` placeholders accordingly):
 
 ```shell
-docker build -t registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game ./game-2048-example
+docker build -t <docker-username>/<docker-repo-name>:game-2048 .
 ```
 
 **Note:**
@@ -61,42 +61,26 @@ The sample [Dockerfile](./Dockerfile) provided in this repository is using the [
 Then, you can issue bellow command to launch the `2048-game` container (make sure to replace the `<>` placeholders accordingly):
 
 ```shell
-docker run --rm -it -p 8080:8080 registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game
+docker run --rm -it -p 8080:8080 <docker-username>/<docker-repo-name>:game-2048
 ```
 
 Now, visit [localhost:8080](http://localhost:8080) to check the 2048 game app in your web browser. Finally, you can push the image to your DigitalOcean docker registry (make sure to replace the `<>` placeholders accordingly):
 
 ```shell
-docker push registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game
+docker push <docker-username>/<docker-repo-name>:game-2048
 ```
-
-**Note:**
-
-Pushing images to your DigitalOcean docker registry is possible only after a successful authentication. Please read the official DigitalOcean [guide](https://docs.digitalocean.com/products/container-registry/how-to/use-registry-docker-kubernetes) and follow the steps. [Integrating with Kubernetes](https://docs.digitalocean.com/products/container-registry/how-to/use-registry-docker-kubernetes/#kubernetes-integration) step is important as well.
 
 ## Deploying to Kubernetes
 
 The [kustomization manifest](kustomize/kustomization.yaml) provided in this repository will get you started with deploying the `2048-game` Kubernetes resources.
 
-First, you need to clone this repository (if not already):
+Next, edit the game-2048 [deployment manifest](kustomize/resources/deployment.yaml) using your favorite text editor (preferably with YAML lint support), and replace the `<>` placeholders with the docker image you just pushed to your Docker Hub repo. For example, you can use [VS Code](https://code.visualstudio.com/):
 
 ```shell
-git clone https://github.com/digitalocean/kubernetes-sample-apps.git
+vim game-2048-example/kustomize/resources/deployment.yaml
 ```
 
-Then, change directory to your local copy:
-
-```shell
-cd kubernetes-sample-apps
-```
-
-Next, edit the game-2048 [deployment manifest](kustomize/resources/deployment.yaml) using your favorite text editor (preferably with YAML lint support), and replace the `<>` placeholders. For example, you can use [VS Code](https://code.visualstudio.com/):
-
-```shell
-code game-2048-example/kustomize/resources/deployment.yaml
-```
-
-Now, create 2048 game Kubernetes resources using the kubectl kustomize option (`-k` flag):
+Now, create Kubernetes resources using the kubectl kustomize option (`-k` flag):
 
 ```shell
 kubectl apply -k game-2048-example/kustomize

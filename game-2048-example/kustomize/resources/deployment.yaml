@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
         - name: backend
-          # Replace the `<>` placeholders with your docker registry info
-          image: registry.digitalocean.com/<YOUR_DOCKER_REGISTRY_NAME_HERE>/2048-game:latest
+          # Replace with your docker hub image url
+          image: pwalsh258/my-container-repo:game-2048
           ports:
             - name: http
               containerPort: 8080
